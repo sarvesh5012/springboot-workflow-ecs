@@ -15,7 +15,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout your source code repository
-                sh "git clone https://github.com/sarvesh5012/springboot-workflow-ecs.git" 
+                sh "git clone https://github.com/sarvesh5012/springboot-workflow-ecs.git"
+                sh "git checkout main"
             }
         }
 
