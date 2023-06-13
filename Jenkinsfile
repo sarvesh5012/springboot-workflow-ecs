@@ -1,43 +1,127 @@
-def COLOR_MAP = [
-    'SUCCESS': 'good', 
-    'FAILURE': 'danger',
-]
 pipeline {
     agent any
-    
+
     environment {
-        registryCredential = 'ecr:us-east-1:awscreds'
-        appRegistry = '382904467012.dkr.ecr.us-east-1.amazonaws.com/mavenregistry'
-        awsRegistry = "https://382904467012.dkr.ecr.us-east-1.amazonaws.com"
-        cluster = "MavenCluster"
-        service = "test-service"
+        AWS_DEFAULT_REGION = 'us-east-1'
+        AWS_ACCESS_KEY_ID = credentials('AKIAVSJXCPZCN7KEPLUC')
+        AWS_SECRET_ACCESS_KEY = credentials('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')
+        ECR_REGISTRY_URL = '382904467012.dkr.ecr.us-east-1.amazonaws.com/mavenregistry'
+        ECS_CLUSTER = 'MavenCluster'
+        ECS_SERVICE = 'test-service'
+        ECS_TASK_DEFINITION = 'tdf-maven'
     }
 
     stages {
-        stage('Build App Image') {
+        stage('Checkout') {
+            steps {
+                // Checkout your source code repository
+                sh "git clone https://github.com/sarvesh5012/springboot-workflow-ecs.git" 
+            }
+        }
+
+        // stage('Build') {
+        //     steps {
+        //         // Build your application
+        //         // e.g., compiling code, running tests, etc.
+        //     }
+        // }
+
+        stage('Docker Build & Push') {
             steps {
                 script {
-                    dockerImage = docker.build( appRegistry + ":$BUILD_NUMBER", "Dockerfile")
+                    def imageName = "${ECR_REGISTRY_URL}:${env.BUILD_NUMBER}"
+
+
+                    // Push Docker image to registry
+                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 382904467012.dkr.ecr.us-east-1.amazonaws.com"
+                    // Build Docker image
+                    sh "docker build -t ${imageName} ."
+                    sh "docker tag mavenregistry:latest 382904467012.dkr.ecr.us-east-1.amazonaws.com/mavenregistry:latest"
+                    sh "docker push 382904467012.dkr.ecr.us-east-1.amazonaws.com/mavenregistry:latest"
+                    }
                 }
             }
         }
-        
-        stage('Upload App Image') {
-          steps{
-            script {
-              docker.withRegistry( awsRegistry, registryCredential ) {
-                dockerImage.push("$BUILD_NUMBER")
-                dockerImage.push('latest')
-              }
-            }
-          }
-        }
-        stage('Deploy to ECS staging') {
+
+        stage('ECS Deployment') {
             steps {
-                withAWS(credentials: 'awscreds', region: 'us-east-1') {
-                    sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+                script {
+                    def ecsParams = [
+                        cluster: env.ECS_CLUSTER,
+                        service: env.ECS_SERVICE,
+                        taskDefinition: env.ECS_TASK_DEFINITION,
+                        tag: "${env.JOB_NAME}:${env.BUILD_NUMBER}",
+                        imageName: "${ECR_REGISTRY_URL}:${env.BUILD_NUMBER}"
+                    ]
+
+                    ecsDeploy(params: ecsParams)
                 }
             }
         }
     }
 }
+
+def ecsDeploy(params) {
+    def awsCommand = "aws ecs update-service --region ${params.cluster.region} --cluster ${params.cluster.name} --service ${params.service.name} --force-new-deployment"
+
+    sh awsCommand
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// def COLOR_MAP = [
+//     'SUCCESS': 'good', 
+//     'FAILURE': 'danger',
+// ]
+// pipeline {
+//     agent any
+    
+//     environment {
+//         registryCredential = 'ecr:us-east-1:awscreds'
+//         appRegistry = '382904467012.dkr.ecr.us-east-1.amazonaws.com/mavenregistry'
+//         awsRegistry = "https://382904467012.dkr.ecr.us-east-1.amazonaws.com"
+//         cluster = "MavenCluster"
+//         service = "test-service"
+//     }
+
+//     stages {
+//         stage('Build App Image') {
+//             steps {
+//                 script {
+//                     dockerImage = docker.build( appRegistry + ":$BUILD_NUMBER", "Dockerfile")
+//                 }
+//             }
+//         }
+        
+//         stage('Upload App Image') {
+//           steps{
+//             script {
+//               docker.withRegistry( awsRegistry, registryCredential ) {
+//                 dockerImage.push("$BUILD_NUMBER")
+//                 dockerImage.push('latest')
+//               }
+//             }
+//           }
+//         }
+//         stage('Deploy to ECS staging') {
+//             steps {
+//                 withAWS(credentials: 'awscreds', region: 'us-east-1') {
+//                     sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+//                 }
+//             }
+//         }
+//     }
+// }
