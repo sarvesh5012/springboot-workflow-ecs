@@ -41,7 +41,7 @@ pipeline {
                     }
                 }
             }
-        }
+        
 
         stage('ECS Deployment') {
             steps {
@@ -59,6 +59,7 @@ pipeline {
             }
         }
     }
+}
 
 
 def ecsDeploy(params) {
