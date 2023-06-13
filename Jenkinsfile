@@ -59,7 +59,7 @@ pipeline {
             }
         }
     }
-}
+
 
 def ecsDeploy(params) {
     def awsCommand = "aws ecs update-service --region ${params.cluster.region} --cluster ${params.cluster.name} --service ${params.service.name} --force-new-deployment"
