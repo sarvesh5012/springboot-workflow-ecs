@@ -5,6 +5,9 @@ pipeline {
         AWS_DEFAULT_REGION="us-east-1"
         IMAGE_REPO_NAME="mavenregistry"
         IMAGE_TAG="latest"
+        CLUSTER_NAME = "MavenCluster"
+        SERVICE_NAME = "test-service"
+        TASKDEF_NAME = "tdf-maven"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
    
@@ -46,6 +49,19 @@ pipeline {
          }
         }
       }
+    
+    stage('ECS Deployment'){
+      steps{
+        script{
+          sh "aws ecs describe-task-definition --task-definition ${TASKDEF_NAME} > task-def.json"
+          sh "jq .taskDefinition task-def.json > taskdefinition.json"
+          sh "jq 'del(.taskDefinitionArn)' taskdefinition.json | jq 'del(.revision)' | jq 'del(.status)' | jq 'del(.requiresAttributes)' | jq 'del(.compatibilities)' | jq 'del(.registeredAt)'| jq 'del(.registeredBy)' > container-definition.json"
+          sh "aws ecs register-task-definition --cli-input-json file://container-definition.json"
+          sh "aws ecs update-service --cluster  ${CLUSTER_NAME} --service  ${SERVICE_NAME} --task-definition  ${TASKDEF_NAME}"
+        }
+      }
+    }
+
     }
 }
 
