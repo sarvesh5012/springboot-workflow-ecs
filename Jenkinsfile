@@ -9,8 +9,7 @@ pipeline {
         SERVICE_NAME = "test-service"
         TASKDEF_NAME = "tdf-maven"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-        cluster = "MavenCluster"
-        service = "test-service"
+        
     }
 
     stages {
@@ -57,7 +56,7 @@ pipeline {
           sh "aws ecs describe-task-definition --task-definition ${TASKDEF_NAME} > task-def.json"
           sh "jq .taskDefinition task-def.json > taskdefinition.json"
           sh "jq 'del(.taskDefinitionArn)' taskdefinition.json | jq 'del(.revision)' | jq 'del(.status)' | jq 'del(.requiresAttributes)' | jq 'del(.compatibilities)' | jq 'del(.registeredAt)'| jq 'del(.registeredBy)' > container-definition.json"
-          sh "jq '.containerDefinitions[0].image = \"${IMAGE_TAG}\"' container-definition.json > temp-taskdef.json"
+          sh "jq '.containerDefinitions[0].image = \"${REPOSITORY_URI}:${IMAGE_TAG}\"' container-definition.json > temp-taskdef.json"
           sh "ls"
           sh "cat temp-taskdef.json"
           sh "aws ecs register-task-definition --cli-input-json file://temp-taskdef.json"
