@@ -54,7 +54,7 @@ pipeline {
     stage('ECS Deployment'){
       steps{
         script{
-          sh "export shortenedString = ${${IMAGE_TAG}:0:7}"
+          sh "export shortenedString = $(echo "$IMAGE_TAG" | cut -c 1-7)"
           sh "echo $shortenedString"
           sh "aws ecs describe-task-definition --task-definition ${TASKDEF_NAME} > task-def.json"
           sh "jq .taskDefinition task-def.json > taskdefinition.json"
