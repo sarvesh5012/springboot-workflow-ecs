@@ -35,8 +35,8 @@ pipeline {
     stage('Building image') {
       steps{
         script {
-          
-          sh "docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG:0:6} ."
+          sh 'export IMAGE_TAG_6="${IMAGE_TAG:0:6}"'
+          sh "docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG_6} ."
         }
       }
     }
@@ -45,9 +45,9 @@ pipeline {
     stage('Pushing to ECR') {
      steps{  
          script {
-                sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:$IMAGE_TAG"
+                sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG_6} ${REPOSITORY_URI}:$IMAGE_TAG_6"
                 sh "aws sts get-caller-identity"
-                sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+                sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:${IMAGE_TAG_6}"
          }
         }
       }
