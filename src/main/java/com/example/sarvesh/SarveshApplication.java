@@ -14,7 +14,7 @@ public class SarveshApplication {
 	@GetMapping("/")
 
 	public String home(){
-		return "Welcome to aws from jenkins";
+		return "Welcome to aws from jenkins with new commit";
 	}
 
 
