@@ -28,7 +28,7 @@ pipeline {
         stage('Cloning Git') {
             steps {
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sarvesh5012/springboot-workflow-ecs.git']])
-                sh "env"     
+                sh "env"        
             }
         }
   
