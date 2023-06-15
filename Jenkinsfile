@@ -12,7 +12,7 @@ pipeline {
         cluster = "MavenCluster"
         service = "test-service"
     }
-   
+
     stages {
         
          stage('Logging into AWS ECR') {
