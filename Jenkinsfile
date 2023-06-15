@@ -9,6 +9,8 @@ pipeline {
         SERVICE_NAME = "test-service"
         TASKDEF_NAME = "tdf-maven"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+        cluster = "MavenCluster"
+        service = "test-service"
     }
    
     stages {
@@ -16,7 +18,7 @@ pipeline {
          stage('Logging into AWS ECR') {
             steps {
                 script {
-            
+                
                 sh "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
                 }
                  
@@ -25,7 +27,8 @@ pipeline {
         
         stage('Cloning Git') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sarvesh5012/springboot-workflow-ecs.git']])     
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sarvesh5012/springboot-workflow-ecs.git']])
+                sh "env"     
             }
         }
   
