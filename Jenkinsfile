@@ -53,6 +53,8 @@ pipeline {
     stage('ECS Deployment'){
       steps{
         script{
+          sh "export shortenedString = IMAGE_TAG.substring(0, Math.min(IMAGE_TAG.length(), 7))"
+          sh "echo $shortenedString"
           sh "aws ecs describe-task-definition --task-definition ${TASKDEF_NAME} > task-def.json"
           sh "jq .taskDefinition task-def.json > taskdefinition.json"
           sh "jq 'del(.taskDefinitionArn)' taskdefinition.json | jq 'del(.revision)' | jq 'del(.status)' | jq 'del(.requiresAttributes)' | jq 'del(.compatibilities)' | jq 'del(.registeredAt)'| jq 'del(.registeredBy)' > container-definition.json"
