@@ -35,7 +35,7 @@ pipeline {
     stage('Building image') {
       steps{
         script {
-          sh "export IMAGE_TAG_6='${IMAGE_TAG:0:6}'"
+          bash "export IMAGE_TAG_6='${IMAGE_TAG:0:6}'"
           sh "echo $IMAGE_TAG_6"
           sh "docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG_6} ."
         }
