@@ -57,11 +57,10 @@ pipeline {
           sh "aws ecs describe-task-definition --task-definition ${TASKDEF_NAME} > task-def.json"
           sh "jq .taskDefinition task-def.json > taskdefinition.json"
           sh "jq 'del(.taskDefinitionArn)' taskdefinition.json | jq 'del(.revision)' | jq 'del(.status)' | jq 'del(.requiresAttributes)' | jq 'del(.compatibilities)' | jq 'del(.registeredAt)'| jq 'del(.registeredBy)' > container-definition.json"
-          sh "tmp=$(mktemp)"
-          sh "jq '.containerDefinitions.image = "${IMAGE_TAG}"' container-definition.json > "$tmp" && mv "$tmp" container-definition.json"
+          sh "jq '.containerDefinitions.image = "${IMAGE_TAG}"' container-definition.json > temp-taskdef.json"
           sh "ls"
-          sh "cat container-definition.json"
-          sh "aws ecs register-task-definition --cli-input-json file://container-definition.json"
+          sh "cat temp-taskdef.json"
+          sh "aws ecs register-task-definition --cli-input-json file://temp-taskdef.json"
           sh "aws ecs update-service --cluster  ${CLUSTER_NAME} --service  ${SERVICE_NAME} --task-definition  ${TASKDEF_NAME}"
         }
       }
