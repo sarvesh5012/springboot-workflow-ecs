@@ -12,6 +12,12 @@ pipeline {
         
     }
     
+      stage('Cloning Git') {
+            steps {
+                checkout scmGit(branches: [[name: '*/${branchName}']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sarvesh5012/springboot-workflow-ecs.git']])
+                sh "env"        
+            }
+        }
 
     stages {
         
@@ -24,12 +30,6 @@ pipeline {
             }
         }
         
-//         stage('Cloning Git') {
-//             steps {
-//                 checkout scmGit(branches: [[name: '*/${branchName}']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/sarvesh5012/springboot-workflow-ecs.git']])
-//                 sh "env"        
-//             }
-//         }
   
 //     // Building Docker images
 //     stage('Building image') {
