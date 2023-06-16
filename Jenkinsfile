@@ -4,7 +4,7 @@ pipeline {
         AWS_ACCOUNT_ID="382904467012"
         AWS_DEFAULT_REGION="us-east-1"
         IMAGE_REPO_NAME="mavenregistry"
-        IMAGE_TAG="${GIT_COMMIT}"
+        //IMAGE_TAG="${GIT_COMMIT}"
         CLUSTER_NAME = "MavenCluster"
         SERVICE_NAME = "test-service"
         TASKDEF_NAME = "tdf-maven"
