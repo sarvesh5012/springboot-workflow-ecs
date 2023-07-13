@@ -1,4 +1,4 @@
-FROM maven:3.8.3-openjdk-17-slim
+FROM 746334784415.dkr.ecr.us-east-1.amazonaws.com/base-img-fluentd:latest
 WORKDIR /app
 COPY . /app
 RUN mvn clean install
