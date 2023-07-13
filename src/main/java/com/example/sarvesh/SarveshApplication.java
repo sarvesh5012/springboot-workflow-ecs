@@ -14,6 +14,7 @@ public class SarveshApplication {
 	@GetMapping("/")
 
 	public String home(){
+		System.out.println("Requested Path: Home");
 		return "Welcome to aws";
 	}
 
