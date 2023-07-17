@@ -1,5 +1,5 @@
 env
-export APP_NAME="JavaApp"
+export APP_NAME="Java-App"
 export NEWRELIC_KEY=a844635132d2d9a07559401d9ac7261b62cdNRAL
 export LOGS_FILE_LOCATION=logs
 export CLUSTER_NAME=`curl ${ECS_CONTAINER_METADATA_URI_V4}/task | jq .Cluster`
